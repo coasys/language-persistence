@@ -28,7 +28,7 @@ pub struct Expression {
 }
 
 entry_defs![
-    Path::entry_def(),
+    PathEntry::entry_def(),
     Expression::entry_def()
 ];
 
@@ -46,7 +46,7 @@ pub fn store_expression(input: StoreInput) -> ExternResult<()> {
 
     create_entry(&input.expression)?;
     let expression_hash = hash_entry(&input.expression)?;
-    create_link(path.hash()?, expression_hash, ())?;
+    create_link(path.path_entry_hash()?, expression_hash, ())?;
     
     Ok(())
 }
@@ -64,7 +64,7 @@ pub struct GetOutput {
 #[hdk_extern]
 pub fn get_expressions(input: GetInput) -> ExternResult<GetOutput> {
     let path = Path::from(input.key);
-    let expressions = get_links_and_load_type::<Expression>(path.hash()?, None)?;
+    let expressions = get_links_and_load_type::<Expression>(path.path_entry_hash()?, None)?;
     Ok(GetOutput{ expressions })
 }
 

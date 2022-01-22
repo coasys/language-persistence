@@ -33,7 +33,15 @@ orchestrator.registerScenario("create a code", async (s, t) => {
   const expression = {
     author: "did:test:test",
     timestamp: new Date().toISOString(),
-    data: [0,1,2].toString(),
+    data: {
+      name: "test",
+      address: "address",
+      description: "description",
+      templateSourceLanguageAddress: null,
+      templateAppliedParams: null,
+      possibleTemplateParams: null,
+      sourceCodeLink: null,
+    },
     proof
   }
 
