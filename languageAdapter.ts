@@ -1,35 +1,34 @@
-import type { Address, LanguageAdapter, PublicSharing, IPFSNode, LanguageContext } from "@perspect3vism/ad4m";
-
-const _appendBuffer = (buffer1, buffer2) => {
-  const tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
-  tmp.set(new Uint8Array(buffer1), 0);
-  tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
-  return tmp.buffer;
-};
-
-const uint8ArrayConcat = (chunks) => {
-  return chunks.reduce(_appendBuffer);
-};
+import type { Address, LanguageAdapter, PublicSharing, LanguageContext } from "@perspect3vism/ad4m";
+import axios from "axios";
+import { PROXY_URL } from ".";
 
 export default class LangAdapter implements LanguageAdapter {
-  #IPFS: IPFSNode;
-
   putAdapter: PublicSharing;
 
   constructor(context: LanguageContext) {
-    this.#IPFS = context.IPFS;
   }
 
   async getLanguageSource(address: Address): Promise<string> {
     const cid = address.toString();
 
-    const chunks = [];
-    // @ts-ignore
-    for await (const chunk of this.#IPFS.cat(cid)) {
-      chunks.push(chunk);
+    let presignedUrl;
+    try {
+      const getPresignedUrl = await axios.get(PROXY_URL+`?key=${cid}`);
+      presignedUrl = getPresignedUrl.data;
+      console.log("Get language source information got presigned url", presignedUrl);
+    } catch (e) {
+      console.error("Get language source failed at getting presigned url", e);
     }
 
-    const fileString = Buffer.from(uint8ArrayConcat(chunks)).toString();
-    return fileString;
+    let languageSource;
+    try {
+      const getLanguageSource = await axios.get(presignedUrl);
+      languageSource = getLanguageSource.data;
+      console.log("Got some language source data");
+    } catch (e) {
+      console.error("Get language source failed at getting language source", e);
+    }
+
+    return languageSource;
   }
 }

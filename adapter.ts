@@ -1,44 +1,36 @@
-import type { Address, Expression, ExpressionAdapter, PublicSharing, HolochainLanguageDelegate, LanguageContext } from "@perspect3vism/ad4m";
-import { IpfsPutAdapter } from "./putAdapter";
-import { DNA_NICK } from "./dna";
-
-const _appendBuffer = (buffer1, buffer2) => {
-  const tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
-  tmp.set(new Uint8Array(buffer1), 0);
-  tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
-  return tmp.buffer;
-};
-
-const uint8ArrayConcat = (chunks) => {
-  return chunks.reduce(_appendBuffer);
-};
+import type { Address, Expression, ExpressionAdapter, PublicSharing, LanguageContext } from "@perspect3vism/ad4m";
+import { CloudflarePutAdapter } from "./putAdapter";
+import axios from "axios";
+import { PROXY_URL } from ".";
 
 export default class Adapter implements ExpressionAdapter {
-  #holochain: HolochainLanguageDelegate;
-
   putAdapter: PublicSharing;
 
   constructor(context: LanguageContext) {
-    this.#holochain = context.Holochain as HolochainLanguageDelegate;
-    this.putAdapter = new IpfsPutAdapter(context);
+    this.putAdapter = new CloudflarePutAdapter(context);
   }
 
   async get(address: Address): Promise<Expression> {
-    const { expressions } = await this.#holochain.call(
-      DNA_NICK,
-      "anchored-expression",
-      "get_expressions",
-      { key: address }
-    );
-
-    if (expressions.length === 0) return null;
-
-
-    const expression = expressions.pop();
-    for(const prop of Object.keys(expression.data)) {
-      if(expression.data[prop] === null)
-        delete expression.data[prop]
+    const metaDataKey = `meta-${address}`;
+    
+    let presignedUrl;
+    try {
+      const getPresignedUrl = await axios.get(PROXY_URL+`?key=${metaDataKey}`);
+      presignedUrl = getPresignedUrl.data;
+      console.log("Get meta information got presigned url", presignedUrl);
+    } catch (e) {
+      console.error("Get meta information failed at getting presigned url", e);
     }
-    return expression;
+
+    let metaObject;
+    try {
+      const getMetaObject = await axios.get(presignedUrl);
+      metaObject = getMetaObject.data;
+      console.log("Get meta object for obj", metaObject);
+    } catch (e) {
+      console.error("Get meta information failed at getting meta information", e);
+    }
+
+    return JSON.parse(metaObject);
   }
 }
