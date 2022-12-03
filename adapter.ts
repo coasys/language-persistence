@@ -10,7 +10,7 @@ export default class Adapter implements ExpressionAdapter {
     this.putAdapter = new CloudflarePutAdapter(context);
   }
 
-  async get(address: Address): Promise<Expression> {
+  async get(address: Address): Promise<Expression | null> {
     const metaDataKey = `meta-${address}`;
     
     let presignedUrl;
@@ -18,7 +18,8 @@ export default class Adapter implements ExpressionAdapter {
       const getPresignedUrl = await axios.get(PROXY_URL+`?key=${metaDataKey}`);
       presignedUrl = getPresignedUrl.data.url;
     } catch (e) {
-      console.error("Get meta information failed at getting presigned url", e);
+      console.error("Get meta information failed at getting presigned url", address);
+      return null;
     }
 
     let metaObject;
@@ -26,7 +27,8 @@ export default class Adapter implements ExpressionAdapter {
       const getMetaObject = await axios.get(presignedUrl);
       metaObject = getMetaObject.data;
     } catch (e) {
-      console.error("Get meta information failed at getting meta information", e);
+      console.error("Get meta information failed at getting meta information", presignedUrl);
+      return null;
     }
 
     return metaObject;
