@@ -16,7 +16,6 @@ export default class LangAdapter implements LanguageAdapter {
     try {
       const getPresignedUrl = await axios.get(PROXY_URL+`?key=${cid}`);
       presignedUrl = getPresignedUrl.data.url;
-      console.log("Get language source information got presigned url", presignedUrl);
     } catch (e) {
       console.error("Get language source failed at getting presigned url", e);
     }
@@ -25,7 +24,6 @@ export default class LangAdapter implements LanguageAdapter {
     try {
       const getLanguageSource = await axios.get(presignedUrl);
       languageSource = getLanguageSource.data;
-      console.log("Got some language source data");
     } catch (e) {
       console.error("Get language source failed at getting language source", e);
     }

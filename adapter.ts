@@ -17,7 +17,6 @@ export default class Adapter implements ExpressionAdapter {
     try {
       const getPresignedUrl = await axios.get(PROXY_URL+`?key=${metaDataKey}`);
       presignedUrl = getPresignedUrl.data.url;
-      console.log("Get meta information got presigned url", presignedUrl);
     } catch (e) {
       console.error("Get meta information failed at getting presigned url", e);
     }
@@ -26,7 +25,6 @@ export default class Adapter implements ExpressionAdapter {
     try {
       const getMetaObject = await axios.get(presignedUrl);
       metaObject = getMetaObject.data;
-      console.log("Get meta object for obj", metaObject);
     } catch (e) {
       console.error("Get meta information failed at getting meta information", e);
     }

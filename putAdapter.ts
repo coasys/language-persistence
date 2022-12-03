@@ -34,7 +34,6 @@ export class CloudflarePutAdapter implements PublicSharing {
       // Content of the new object.
       value: JSON.stringify(expression),
     };
-    console.log("creating language object with meta", metaPostData);
     //Save the meta information to the KV store
     const httpsAgent = new https.Agent({
       rejectUnauthorized: false
