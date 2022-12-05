@@ -11,6 +11,11 @@ export default class Adapter implements ExpressionAdapter {
   }
 
   async get(address: Address): Promise<Expression | null> {
+    //Check the first two characters of address are equal to Qm
+    if (address.substring(0, 2) != "Qm") {
+      console.error("LanguageLanguage.get(): The address is not a valid hash");
+      return null;
+    }
     const metaDataKey = `meta-${address}`;
     
     let presignedUrl;

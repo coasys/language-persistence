@@ -10,6 +10,11 @@ export default class LangAdapter implements LanguageAdapter {
   }
 
   async getLanguageSource(address: Address): Promise<string> {
+    //Check the first two characters of address are equal to Qm
+    if (address.substring(0, 2) != "Qm") {
+      console.error("LanguageLanguage.getLanguageSource(): The address is not a valid hash");
+      return "";
+    }
     const cid = address.toString();
 
     let presignedUrl;
