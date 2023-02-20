@@ -23,6 +23,7 @@ export default class LangAdapter implements LanguageAdapter {
       presignedUrl = getPresignedUrl.data.url;
     } catch (e) {
       console.error("Get language source failed at getting presigned url", address);
+      console.error("Error throws:", e);
       throw (e)
     }
 
@@ -32,6 +33,7 @@ export default class LangAdapter implements LanguageAdapter {
       languageSource = getLanguageSource.data;
     } catch (e) {
       console.error("Get language source failed at getting language source", address);
+      console.error("Error throws:", e);
       throw (e)
     }
 
